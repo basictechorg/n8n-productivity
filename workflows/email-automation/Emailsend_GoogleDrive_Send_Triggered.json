@@ -1,0 +1,62 @@
+{
+  "nodes": [
+    {
+      "name": "Google Drive Trigger",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "position": [
+        250,
+        150
+      ],
+      "parameters": {
+        "event": "fileCreated",
+        "options": {},
+        "triggerOn": "specificFolder",
+        "folderToWatch": "1HwOAKkkgveLji8vVpW9Xrg1EsBskwMNb"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "name": "Add your googleDriveOAuth2Api credential"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [
+        450,
+        150
+      ],
+      "parameters": {
+        "text": "=A file in your Google Drive file folder has been created: {{$json[\"name\"]}}",
+        "options": {},
+        "subject": "File Update",
+        "toEmail": "mutedjam@n8n.io",
+        "fromEmail": "mutedjam@n8n.io"
+      },
+      "credentials": {
+        "smtp": {
+          "name": "Add your smtp credential"
+        }
+      },
+      "typeVersion": 1
+    }
+  ],
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "wf145f85e8e5a2"
+}

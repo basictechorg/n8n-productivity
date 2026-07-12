@@ -1,0 +1,84 @@
+{
+  "nodes": [
+    {
+      "id": "fa143713-0a54-465b-bfeb-cfb180871ab4",
+      "name": "On file upload",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "position": [
+        240,
+        480
+      ],
+      "parameters": {
+        "event": "fileCreated",
+        "options": {},
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": "1_vYi00lSdzU2p6wGrnW_IqsOblOL-3zG"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "name": "Add your googleDriveOAuth2Api credential"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "78fe0319-e8bf-4c37-8d49-2cd1d6d084e6",
+      "name": "Create database page",
+      "type": "n8n-nodes-base.notion",
+      "position": [
+        440,
+        480
+      ],
+      "parameters": {
+        "title": "={{$(\"On file upload\").item.json[\"name\"]}}",
+        "resource": "databasePage",
+        "databaseId": "d637c796-d33b-4768-b955-55c66a0966b7",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "File|files",
+              "fileUrls": {
+                "fileUrl": [
+                  {
+                    "url": "={{ $json[\"webViewLink\"] }}",
+                    "name": "={{ $(\"On file upload\").item.json[\"name\"] }}"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "notionApi": {
+          "name": "Add your notionApi credential"
+        }
+      },
+      "typeVersion": 2
+    }
+  ],
+  "connections": {
+    "On file upload": {
+      "main": [
+        [
+          {
+            "node": "Create database page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "wf8c68290fcb92"
+}

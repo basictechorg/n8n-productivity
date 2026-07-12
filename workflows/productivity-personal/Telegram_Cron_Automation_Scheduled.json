@@ -1,0 +1,82 @@
+{
+  "id": "wffa88ed3942ad",
+  "name": "Daily Journal Reminder",
+  "nodes": [
+    {
+      "name": "Morning reminder",
+      "type": "n8n-nodes-base.cron",
+      "notes": "Trigger very morning",
+      "position": [
+        220,
+        60
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 6
+            }
+          ]
+        }
+      },
+      "notesInFlow": true,
+      "typeVersion": 1,
+      "alwaysOutputData": true
+    },
+    {
+      "name": "format reminder",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        460,
+        60
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Creates message with yesterday's date\nconst today = new Date();\nconst yesterday = new Date(today);\nyesterday.setDate(yesterday.getDate() - 1);\nconst message = `What did you do: ${yesterday.toISOString().split('T')[0]}`;\n\nreturn { json: { message } };"
+      },
+      "typeVersion": 2
+    },
+    {
+      "name": "Send journal reminder",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        700,
+        60
+      ],
+      "parameters": {
+        "text": "={{$(\"format reminder\").item.json[\"message\"]}}",
+        "chatId": "666884239",
+        "additionalFields": {}
+      },
+      "credentials": {},
+      "typeVersion": 1
+    }
+  ],
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "connections": {
+    "format reminder": {
+      "main": [
+        [
+          {
+            "node": "Send journal reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Morning reminder": {
+      "main": [
+        [
+          {
+            "node": "format reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

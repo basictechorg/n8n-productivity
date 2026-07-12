@@ -1,0 +1,151 @@
+{
+  "nodes": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "path": "your-webhook-path",
+        "options": {
+          "rawBody": true
+        },
+        "httpMethod": "POST",
+        "authentication": "headerAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": "Webhook Workflow Credentials"
+      },
+      "typeVersion": 1
+    },
+    {
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "Name",
+              "value": "={{$json[\"body\"][\"name\"]}}"
+            },
+            {
+              "name": "Number",
+              "value": "={{$json[\"body\"][\"number\"]}}"
+            },
+            {
+              "name": "City",
+              "value": "={{$json[\"body\"][\"city\"]}}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      },
+      "typeVersion": 1
+    },
+    {
+      "name": "Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "position": [
+        850,
+        300
+      ],
+      "parameters": {
+        "table": "Table 1",
+        "options": {},
+        "operation": "append"
+      },
+      "credentials": {
+        "airtableApi": "Airtable Credentials n8n"
+      },
+      "typeVersion": 1
+    },
+    {
+      "name": "OpenWeatherMap",
+      "type": "n8n-nodes-base.openWeatherMap",
+      "position": [
+        1050,
+        300
+      ],
+      "parameters": {
+        "cityName": "={{$(\"Webhook\").item.json[\"body\"][\"city\"]}}"
+      },
+      "credentials": {
+        "openWeatherMapApi": "open-weather-map"
+      },
+      "typeVersion": 1
+    },
+    {
+      "name": "Twilio",
+      "type": "n8n-nodes-base.twilio",
+      "position": [
+        1250,
+        300
+      ],
+      "parameters": {
+        "to": "={{$(\"Webhook\").item.json[\"body\"][\"number\"]}}",
+        "message": "=The weather in {{$json[\"name\"]}}, {{$json[\"sys\"][\"country\"]}} is {{$json[\"main\"][\"temp\"]}} ℃ with {{$json[\"weather\"][0][\"description\"]}}. Humidity is {{$json[\"main\"][\"humidity\"]}} and windspeed is {{$json[\"wind\"][\"speed\"]}}."
+      },
+      "credentials": {
+        "twilioApi": "twilio"
+      },
+      "typeVersion": 1
+    }
+  ],
+  "connections": {
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        [
+          {
+            "node": "OpenWeatherMap",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenWeatherMap": {
+      "main": [
+        [
+          {
+            "node": "Twilio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "wfa21630d616a4"
+}
